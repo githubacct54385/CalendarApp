@@ -18,15 +18,15 @@ namespace CalendarApp.Core.GetCalendar {
             _futureDateProvider = futureDateProvider;
         }
 
-        public List<CalendarItem> GetItems () {
+        public List<CalendarSummaryItem> GetItems () {
             var today = _dateProvider.GetToday ();
             var items = _calendarItemProvider.GetItems ();
             var newItems = GetNewStartDatesIfNecessary (items);
             var afterToday = newItems.Where (p => p.RepeatRules.StartOn > today).ToList ();
             if (!afterToday.Any ()) {
-                return new List<CalendarItem> ();
+                return new List<CalendarSummaryItem> ();
             }
-            var remindersToReturn = new List<CalendarItem> ();
+            var remindersToReturn = new List<CalendarSummaryItem> ();
             var nthDayOfMonthRules = afterToday.Where (p => p.When.NthDayOfMonthRules != null).ToList ();
             var nthWeekdayOfMonthRules = afterToday.Where (p => p.When.NthWeekdayOfMonthRules != null).ToList ();
 
@@ -35,8 +35,9 @@ namespace CalendarApp.Core.GetCalendar {
             return remindersToReturn;
         }
 
-        private IEnumerable<CalendarItem> AddNthWeekdayOfMonthRules (List<CalendarItem> nthWeekdayOfMonthRules) {
-            var remindersToReturn = new List<CalendarItem> ();
+        private IEnumerable<CalendarSummaryItem> AddNthWeekdayOfMonthRules (List<CalendarItem> nthWeekdayOfMonthRules) {
+            var remindersToReturn = new List<CalendarSummaryItem> ();
+
             nthWeekdayOfMonthRules.ForEach (entry => {
                 entry.Reminders.Split (',').ToList ().ForEach (reminder => {
                     CheckReminderLength (reminder);
@@ -46,8 +47,9 @@ namespace CalendarApp.Core.GetCalendar {
             return remindersToReturn;
         }
 
-        private List<CalendarItem> AddNthDayOfMonthRules (List<CalendarItem> nthDayOfMonthRules) {
-            var remindersToReturn = new List<CalendarItem> ();
+        private List<CalendarSummaryItem> AddNthDayOfMonthRules (List<CalendarItem> nthDayOfMonthRules) {
+            var remindersToReturn = new List<CalendarSummaryItem> ();
+
             nthDayOfMonthRules.ForEach (entry => {
                 entry.Reminders.Split (',').ToList ().ForEach (reminder => {
                     CheckReminderLength (reminder);
@@ -57,7 +59,7 @@ namespace CalendarApp.Core.GetCalendar {
             return remindersToReturn;
         }
 
-        private void AddCalendarItemsToList (CalendarItem entry, string reminder, List<CalendarItem> remindersToReturn) {
+        private void AddCalendarItemsToList (CalendarItem entry, string reminder, List<CalendarSummaryItem> remindersToReturn) {
             int.TryParse (reminder[0].ToString (), out int amount);
             var unit = reminder[1];
             switch (unit) {
@@ -65,7 +67,7 @@ namespace CalendarApp.Core.GetCalendar {
                     var daysInMonth = 30;
                     if (IsWithinReminderThreshold (amount, daysInMonth, entry)) {
                         if (CanAddToReminders (remindersToReturn, entry)) {
-                            remindersToReturn.Add (entry);
+                            remindersToReturn.Add (entry.ToSummaryItem (Threshold.Month));
                         }
                     }
                     break;
@@ -73,7 +75,22 @@ namespace CalendarApp.Core.GetCalendar {
                     var daysInWeek = 7;
                     if (IsWithinReminderThreshold (amount, daysInWeek, entry)) {
                         if (CanAddToReminders (remindersToReturn, entry)) {
-                            remindersToReturn.Add (entry);
+                            switch (amount) {
+                                case 1:
+                                    remindersToReturn.Add (entry.ToSummaryItem (Threshold.OneWeek));
+                                    break;
+                                case 2:
+                                    remindersToReturn.Add (entry.ToSummaryItem (Threshold.TwoWeeks));
+                                    break;
+                                case 3:
+                                    remindersToReturn.Add (entry.ToSummaryItem (Threshold.ThreeWeeks));
+                                    break;
+                                case 4:
+                                    remindersToReturn.Add (entry.ToSummaryItem (Threshold.FourWeeks));
+                                    break;
+                                default:
+                                    throw new ArgumentException ($"Week amount {amount} is not supported.  Use Month if you want more.");
+                            }
                         }
                     }
                     break;
@@ -81,7 +98,7 @@ namespace CalendarApp.Core.GetCalendar {
                     var day = 1;
                     if (IsWithinReminderThreshold (amount, day, entry)) {
                         if (CanAddToReminders (remindersToReturn, entry)) {
-                            remindersToReturn.Add (entry);
+                            remindersToReturn.Add (entry.ToSummaryItem (Threshold.OneDay));
                         }
                     }
                     break;
@@ -131,8 +148,8 @@ namespace CalendarApp.Core.GetCalendar {
             return false;
         }
 
-        private bool CanAddToReminders (List<CalendarItem> list, CalendarItem newItem) {
-            if (list.Contains (newItem)) {
+        private bool CanAddToReminders (List<CalendarSummaryItem> list, CalendarItem newItem) {
+            if (list.Any (item => item.TheSameItem (newItem))) {
                 return false;
             }
             return true;

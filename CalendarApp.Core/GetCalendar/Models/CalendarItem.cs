@@ -53,5 +53,13 @@ namespace CalendarApp.Core.GetCalendar.Models {
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode (Reminders);
             return hashCode;
         }
+
+        internal CalendarSummaryItem ToSummaryItem (Threshold threshold) {
+            return new CalendarSummaryItem (
+                this.Id,
+                this.Name,
+                this.Reminder,
+                threshold);
+        }
     }
 }

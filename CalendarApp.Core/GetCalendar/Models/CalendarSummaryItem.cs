@@ -12,11 +12,22 @@ namespace CalendarApp.Core.GetCalendar.Models {
             Reminder = reminder;
             Threshold = threshold;
         }
+
+        internal bool TheSameItem (CalendarItem item) {
+            if (this.Id == item.Id &&
+                this.Name == item.Name &&
+                this.Reminder == item.Reminder) {
+                return true;
+            }
+            return false;
+        }
     }
 
     public enum Threshold {
         Month,
-        TwoWeek,
+        FourWeeks,
+        ThreeWeeks,
+        TwoWeeks,
         OneWeek,
         LessThanWeek,
         OneDay
