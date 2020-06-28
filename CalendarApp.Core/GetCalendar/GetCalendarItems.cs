@@ -75,15 +75,16 @@ namespace CalendarApp.Core.GetCalendar {
 
         private List<CalendarItem> GetNewStartDatesIfNecessary (List<CalendarItem> calendarItems) {
             return calendarItems.Select (item => {
-                if (item.RepeatRules.StartOn.Year < _dateProvider.GetToday ().Year) {
-                    return UpdatedDateCalendarItem (item);
+                var previousYear = item.RepeatRules.StartOn.Year < _dateProvider.GetToday ().Year;
+                if (previousYear) {
+                    return CalendarItemWithThisYear (item);
                 } else {
                     return item;
                 }
             }).ToList ();
         }
 
-        private CalendarItem UpdatedDateCalendarItem (CalendarItem item) {
+        private CalendarItem CalendarItemWithThisYear (CalendarItem item) {
             var repeatRules = item.RepeatRules;
             var startOn = repeatRules.StartOn;
             var date = new DateTime (_dateProvider.GetToday ().Year, startOn.Month, startOn.Day);
