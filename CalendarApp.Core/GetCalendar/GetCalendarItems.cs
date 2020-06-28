@@ -25,19 +25,18 @@ namespace CalendarApp.Core.GetCalendar {
             var nthDayOfMonthRules = afterToday.Where (p => p.When.NthDayOfMonthRules != null).ToList ();
             var nthWeekdayOfMonthRules = afterToday.Where (p => p.When.NthWeekdayOfMonthRules != null).ToList ();
 
-            // nthWeekdayOfMonthRules.ForEach (entry => {
-            //     entry.Reminders.Split (',').ToList ().ForEach (reminder => {
-            //         if (reminder.Length != 2) {
-            //             throw new ArgumentException ("Reminder length is not length of 2.  Configuration is wrong.");
-            //         }
-            //     });
-            // });
+            remindersToReturn.AddRange (AddNthDayOfMonthRules (nthDayOfMonthRules));
+            remindersToReturn.AddRange (AddNthWeekdayOfMonthRules (nthWeekdayOfMonthRules));
+            return remindersToReturn;
+        }
 
-            nthDayOfMonthRules.ForEach (entry => {
+        private IEnumerable<CalendarItem> AddNthWeekdayOfMonthRules (List<CalendarItem> nthWeekdayOfMonthRules) {
+            var remindersToReturn = new List<CalendarItem> ();
+            nthWeekdayOfMonthRules.ForEach (entry => {
                 entry.Reminders.Split (',').ToList ().ForEach (reminder => {
-                    if (reminder.Length != 2) {
-                        throw new ArgumentException ("Reminder length is not length of 2.  Configuration is wrong.");
-                    }
+
+                    CheckReminderLength (reminder);
+
                     int.TryParse (reminder[0].ToString (), out int amount);
                     var unit = reminder[1];
                     switch (unit) {
@@ -71,6 +70,54 @@ namespace CalendarApp.Core.GetCalendar {
                 });
             });
             return remindersToReturn;
+        }
+
+        private List<CalendarItem> AddNthDayOfMonthRules (List<CalendarItem> nthDayOfMonthRules) {
+            var remindersToReturn = new List<CalendarItem> ();
+            nthDayOfMonthRules.ForEach (entry => {
+                entry.Reminders.Split (',').ToList ().ForEach (reminder => {
+
+                    CheckReminderLength (reminder);
+
+                    int.TryParse (reminder[0].ToString (), out int amount);
+                    var unit = reminder[1];
+                    switch (unit) {
+                        case 'm':
+                            var daysInMonth = 30;
+                            if (IsWithinReminderThreshold (amount, daysInMonth, entry)) {
+                                if (CanAddToReminders (remindersToReturn, entry)) {
+                                    remindersToReturn.Add (entry);
+                                }
+                            }
+                            break;
+                        case 'w':
+                            var daysInWeek = 7;
+                            if (IsWithinReminderThreshold (amount, daysInWeek, entry)) {
+                                if (CanAddToReminders (remindersToReturn, entry)) {
+                                    remindersToReturn.Add (entry);
+                                }
+                            }
+                            break;
+                        case 'd':
+                            var day = 1;
+                            if (IsWithinReminderThreshold (amount, day, entry)) {
+                                if (CanAddToReminders (remindersToReturn, entry)) {
+                                    remindersToReturn.Add (entry);
+                                }
+                            }
+                            break;
+                        default:
+                            throw new ArgumentException ("Unknown unit.  Only m,w,d are allowed.");
+                    }
+                });
+            });
+            return remindersToReturn;
+        }
+
+        private void CheckReminderLength (string reminder) {
+            if (reminder.Length != 2) {
+                throw new ArgumentException ("Reminder length is not length of 2.  Configuration is wrong.");
+            }
         }
 
         private List<CalendarItem> GetNewStartDatesIfNecessary (List<CalendarItem> calendarItems) {
