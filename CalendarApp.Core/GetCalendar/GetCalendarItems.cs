@@ -66,7 +66,10 @@ namespace CalendarApp.Core.GetCalendar {
 
         private bool IsWithinReminderThreshold (int amount, int unit, CalendarItem entry) {
             var daysToAdd = amount * unit;
-            if (_dateProvider.GetToday ().AddDays (daysToAdd) >= entry.RepeatRules.StartOn) {
+            var startOn = entry.RepeatRules.StartOn;
+            var dateMinusReminderLength = startOn - TimeSpan.FromDays (daysToAdd);
+            var today = _dateProvider.GetToday ();
+            if (dateMinusReminderLength == today) {
                 return true;
             }
             return false;
