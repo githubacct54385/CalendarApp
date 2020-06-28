@@ -6,18 +6,23 @@ using CalendarApp.Core.GetCalendar.Models;
 
 namespace CalendarApp.Core.GetCalendar {
     public class GetCalendarItems {
-
         private readonly ICalendarItemProvider _calendarItemProvider;
         private readonly IDateProvider _dateProvider;
-        public GetCalendarItems (ICalendarItemProvider calendarItemProvider, IDateProvider dateProvider) {
+        private readonly IFutureDateProvider _futureDateProvider;
+        public GetCalendarItems (
+            ICalendarItemProvider calendarItemProvider,
+            IDateProvider dateProvider,
+            IFutureDateProvider futureDateProvider) {
             _calendarItemProvider = calendarItemProvider;
             _dateProvider = dateProvider;
+            _futureDateProvider = futureDateProvider;
         }
 
         public List<CalendarItem> GetItems () {
+            var today = _dateProvider.GetToday ();
             var items = _calendarItemProvider.GetItems ();
             var newItems = GetNewStartDatesIfNecessary (items);
-            var afterToday = newItems.Where (p => p.RepeatRules.StartOn > _dateProvider.GetToday ()).ToList ();
+            var afterToday = newItems.Where (p => p.RepeatRules.StartOn > today).ToList ();
             if (!afterToday.Any ()) {
                 return new List<CalendarItem> ();
             }
@@ -121,12 +126,17 @@ namespace CalendarApp.Core.GetCalendar {
         }
 
         private List<CalendarItem> GetNewStartDatesIfNecessary (List<CalendarItem> calendarItems) {
+
             return calendarItems.Select (item => {
-                var previousYear = item.RepeatRules.StartOn.Year < _dateProvider.GetToday ().Year;
-                if (previousYear) {
-                    return CalendarItemWithThisYear (item);
+                if (item.When.NthWeekdayOfMonthRules != null) {
+                    return _futureDateProvider.CalcCalendarItemForThisYear (item);
                 } else {
-                    return item;
+                    var previousYear = item.RepeatRules.StartOn.Year < _dateProvider.GetToday ().Year;
+                    if (previousYear) {
+                        return _futureDateProvider.CalcFutureDate (item);
+                    } else {
+                        return item;
+                    }
                 }
             }).ToList ();
         }

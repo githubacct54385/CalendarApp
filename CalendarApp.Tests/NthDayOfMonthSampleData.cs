@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using CalendarApp.Core.GetCalendar.Models;
 
 namespace CalendarApp.Tests {
-    public class SampleData {
-        public static List<CalendarItem> GetSampleCalendarItemsWithItems (int numItems, int year) {
+    public class NthDayOfMonthSampleData {
+        public static List<CalendarItem> SampleDates (int numItems, int year) {
             switch (numItems) {
                 case 1:
                     return new List<CalendarItem> () {
@@ -25,7 +25,7 @@ namespace CalendarApp.Tests {
                 name: "Christmas",
                 reminder: "Say Merry Christmas to your friends and family.",
                 repeatsYearly : true,
-                when : new When (new NthDayOfMonthRules (12, 25), nthWeekOfMonthRules : null),
+                when : new When (new NthDayOfMonthRules (12, 25), nthWeekdayOfMonthRules : null),
                 repeatRules : new RepeatRules (startOn: new DateTime (year, 12, 25), endOn : null),
                 reminders: "1d,3d,7d,2w,1m"
             );
@@ -37,7 +37,7 @@ namespace CalendarApp.Tests {
                 name: "Halloween",
                 reminder: "Go trick or treating and be spooky!",
                 repeatsYearly : true,
-                when : new When (new NthDayOfMonthRules (10, 31), nthWeekOfMonthRules : null),
+                when : new When (new NthDayOfMonthRules (10, 31), nthWeekdayOfMonthRules : null),
                 repeatRules : new RepeatRules (startOn: new DateTime (year, 10, 31), endOn : null),
                 reminders: "1d,3d,7d,2w,1m"
             );

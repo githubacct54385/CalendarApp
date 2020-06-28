@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace CalendarApp.Core.GetCalendar.Models {
     public class When {
-        public When (NthDayOfMonthRules nthDayOfMonthRules, NthWeekdayOfMonthRules nthWeekOfMonthRules) {
+        public When (NthDayOfMonthRules nthDayOfMonthRules, NthWeekdayOfMonthRules nthWeekdayOfMonthRules) {
             NthDayOfMonthRules = nthDayOfMonthRules;
-            NthWeekdayOfMonthRules = nthWeekOfMonthRules;
+            NthWeekdayOfMonthRules = nthWeekdayOfMonthRules;
         }
 
         public NthDayOfMonthRules NthDayOfMonthRules { get; }
