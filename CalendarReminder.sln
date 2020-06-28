@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendarApp.Function", "CalendarApp.Function\CalendarApp.Function.csproj", "{34807F52-A5A4-45BE-85D2-4C58C71BD783}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendarApp.Tests", "CalendarApp.Tests\CalendarApp.Tests.csproj", "{11E95228-50EA-4307-BEA8-605912086264}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendarApp.Core", "CalendarApp.Core\CalendarApp.Core.csproj", "{4BD6CB41-95A2-48A6-A025-E39B09E312D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,29 @@ Global
 		{34807F52-A5A4-45BE-85D2-4C58C71BD783}.Release|x64.Build.0 = Release|Any CPU
 		{34807F52-A5A4-45BE-85D2-4C58C71BD783}.Release|x86.ActiveCfg = Release|Any CPU
 		{34807F52-A5A4-45BE-85D2-4C58C71BD783}.Release|x86.Build.0 = Release|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Debug|x64.Build.0 = Debug|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Debug|x86.Build.0 = Debug|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Release|x64.ActiveCfg = Release|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Release|x64.Build.0 = Release|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Release|x86.ActiveCfg = Release|Any CPU
+		{11E95228-50EA-4307-BEA8-605912086264}.Release|x86.Build.0 = Release|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Debug|x64.Build.0 = Debug|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Debug|x86.Build.0 = Debug|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Release|x64.ActiveCfg = Release|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Release|x64.Build.0 = Release|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{4BD6CB41-95A2-48A6-A025-E39B09E312D6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
