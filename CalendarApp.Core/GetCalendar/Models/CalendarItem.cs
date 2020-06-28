@@ -21,6 +21,16 @@ namespace CalendarApp.Core.GetCalendar.Models {
         public RepeatRules RepeatRules { get; }
         public string Reminders { get; }
 
+        public bool EqualsWithoutRepeatRules (object obj) {
+            return obj is CalendarItem item &&
+                Id.Equals (item.Id) &&
+                Name == item.Name &&
+                Reminder == item.Reminder &&
+                RepeatsYearly == item.RepeatsYearly &&
+                EqualityComparer<When>.Default.Equals (When, item.When) &&
+                Reminders == item.Reminders;
+        }
+
         public override bool Equals (object obj) {
             return obj is CalendarItem item &&
                 Id.Equals (item.Id) &&

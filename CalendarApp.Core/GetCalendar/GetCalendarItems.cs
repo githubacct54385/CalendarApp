@@ -16,13 +16,22 @@ namespace CalendarApp.Core.GetCalendar {
 
         public List<CalendarItem> GetItems () {
             var items = _calendarItemProvider.GetItems ();
-            var afterToday = items.Where (p => p.RepeatRules.StartOn > _dateProvider.GetToday ()).ToList ();
+            var newItems = GetNewStartDatesIfNecessary (items);
+            var afterToday = newItems.Where (p => p.RepeatRules.StartOn > _dateProvider.GetToday ()).ToList ();
             if (!afterToday.Any ()) {
                 return new List<CalendarItem> ();
             }
             var remindersToReturn = new List<CalendarItem> ();
             var nthDayOfMonthRules = afterToday.Where (p => p.When.NthDayOfMonthRules != null).ToList ();
             var nthWeekdayOfMonthRules = afterToday.Where (p => p.When.NthWeekdayOfMonthRules != null).ToList ();
+
+            // nthWeekdayOfMonthRules.ForEach (entry => {
+            //     entry.Reminders.Split (',').ToList ().ForEach (reminder => {
+            //         if (reminder.Length != 2) {
+            //             throw new ArgumentException ("Reminder length is not length of 2.  Configuration is wrong.");
+            //         }
+            //     });
+            // });
 
             nthDayOfMonthRules.ForEach (entry => {
                 entry.Reminders.Split (',').ToList ().ForEach (reminder => {
@@ -62,6 +71,24 @@ namespace CalendarApp.Core.GetCalendar {
                 });
             });
             return remindersToReturn;
+        }
+
+        private List<CalendarItem> GetNewStartDatesIfNecessary (List<CalendarItem> calendarItems) {
+            return calendarItems.Select (item => {
+                if (item.RepeatRules.StartOn.Year < _dateProvider.GetToday ().Year) {
+                    return UpdatedDateCalendarItem (item);
+                } else {
+                    return item;
+                }
+            }).ToList ();
+        }
+
+        private CalendarItem UpdatedDateCalendarItem (CalendarItem item) {
+            var repeatRules = item.RepeatRules;
+            var startOn = repeatRules.StartOn;
+            var date = new DateTime (_dateProvider.GetToday ().Year, startOn.Month, startOn.Day);
+            var newRepeatRules = new RepeatRules (date, repeatRules.EndOn);
+            return new CalendarItem (item.Id, item.Name, item.Reminder, item.RepeatsYearly, item.When, newRepeatRules, item.Reminders);
         }
 
         private bool IsWithinReminderThreshold (int amount, int unit, CalendarItem entry) {
