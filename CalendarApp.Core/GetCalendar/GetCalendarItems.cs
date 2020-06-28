@@ -39,39 +39,8 @@ namespace CalendarApp.Core.GetCalendar {
             var remindersToReturn = new List<CalendarItem> ();
             nthWeekdayOfMonthRules.ForEach (entry => {
                 entry.Reminders.Split (',').ToList ().ForEach (reminder => {
-
                     CheckReminderLength (reminder);
-
-                    int.TryParse (reminder[0].ToString (), out int amount);
-                    var unit = reminder[1];
-                    switch (unit) {
-                        case 'm':
-                            var daysInMonth = 30;
-                            if (IsWithinReminderThreshold (amount, daysInMonth, entry)) {
-                                if (CanAddToReminders (remindersToReturn, entry)) {
-                                    remindersToReturn.Add (entry);
-                                }
-                            }
-                            break;
-                        case 'w':
-                            var daysInWeek = 7;
-                            if (IsWithinReminderThreshold (amount, daysInWeek, entry)) {
-                                if (CanAddToReminders (remindersToReturn, entry)) {
-                                    remindersToReturn.Add (entry);
-                                }
-                            }
-                            break;
-                        case 'd':
-                            var day = 1;
-                            if (IsWithinReminderThreshold (amount, day, entry)) {
-                                if (CanAddToReminders (remindersToReturn, entry)) {
-                                    remindersToReturn.Add (entry);
-                                }
-                            }
-                            break;
-                        default:
-                            throw new ArgumentException ("Unknown unit.  Only m,w,d are allowed.");
-                    }
+                    AddCalendarItemsToList (entry, reminder, remindersToReturn);
                 });
             });
             return remindersToReturn;
@@ -81,42 +50,44 @@ namespace CalendarApp.Core.GetCalendar {
             var remindersToReturn = new List<CalendarItem> ();
             nthDayOfMonthRules.ForEach (entry => {
                 entry.Reminders.Split (',').ToList ().ForEach (reminder => {
-
                     CheckReminderLength (reminder);
-
-                    int.TryParse (reminder[0].ToString (), out int amount);
-                    var unit = reminder[1];
-                    switch (unit) {
-                        case 'm':
-                            var daysInMonth = 30;
-                            if (IsWithinReminderThreshold (amount, daysInMonth, entry)) {
-                                if (CanAddToReminders (remindersToReturn, entry)) {
-                                    remindersToReturn.Add (entry);
-                                }
-                            }
-                            break;
-                        case 'w':
-                            var daysInWeek = 7;
-                            if (IsWithinReminderThreshold (amount, daysInWeek, entry)) {
-                                if (CanAddToReminders (remindersToReturn, entry)) {
-                                    remindersToReturn.Add (entry);
-                                }
-                            }
-                            break;
-                        case 'd':
-                            var day = 1;
-                            if (IsWithinReminderThreshold (amount, day, entry)) {
-                                if (CanAddToReminders (remindersToReturn, entry)) {
-                                    remindersToReturn.Add (entry);
-                                }
-                            }
-                            break;
-                        default:
-                            throw new ArgumentException ("Unknown unit.  Only m,w,d are allowed.");
-                    }
+                    AddCalendarItemsToList (entry, reminder, remindersToReturn);
                 });
             });
             return remindersToReturn;
+        }
+
+        private void AddCalendarItemsToList (CalendarItem entry, string reminder, List<CalendarItem> remindersToReturn) {
+            int.TryParse (reminder[0].ToString (), out int amount);
+            var unit = reminder[1];
+            switch (unit) {
+                case 'm':
+                    var daysInMonth = 30;
+                    if (IsWithinReminderThreshold (amount, daysInMonth, entry)) {
+                        if (CanAddToReminders (remindersToReturn, entry)) {
+                            remindersToReturn.Add (entry);
+                        }
+                    }
+                    break;
+                case 'w':
+                    var daysInWeek = 7;
+                    if (IsWithinReminderThreshold (amount, daysInWeek, entry)) {
+                        if (CanAddToReminders (remindersToReturn, entry)) {
+                            remindersToReturn.Add (entry);
+                        }
+                    }
+                    break;
+                case 'd':
+                    var day = 1;
+                    if (IsWithinReminderThreshold (amount, day, entry)) {
+                        if (CanAddToReminders (remindersToReturn, entry)) {
+                            remindersToReturn.Add (entry);
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentException ("Unknown unit.  Only m,w,d are allowed.");
+            }
         }
 
         private void CheckReminderLength (string reminder) {
