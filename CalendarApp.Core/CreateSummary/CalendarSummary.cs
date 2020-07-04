@@ -21,15 +21,47 @@ namespace CalendarApp.Core.CreateSummary {
         public void Create () {
             var today = _dateProvider.GetToday ();
 
-            var oneMonthOutItems = this.Items
-                .Select (calItem => {
-                    if (today.AddDays (30) == calItem.DateOfCalItemThisYear) {
-                        return calItem;
+            var oneMonthOutItems = this.Items.Where (calItem => {
+                if (today.AddDays (30) == calItem.DateOfCalItemThisYear) {
+                    return true;
+                }
+                return false;
+            }).ToList ();
+
+            var twoWeekOutItems = this.Items
+                .Where (calItem => {
+                    if (today.AddDays (14) == calItem.DateOfCalItemThisYear) {
+                        return true;
                     }
-                    return null;
-                }).Where (p => p != null).ToList ();
+                    return false;
+                }).ToList ();
+
+            var oneWeekOutItem = this.Items.Where (calItem => {
+                if (today.AddDays (7) == calItem.DateOfCalItemThisYear) {
+                    return true;
+                }
+                return false;
+            }).ToList ();
+
+            var threeDaysOutItem = this.Items.Where (calItem => {
+                if (today.AddDays (3) == calItem.DateOfCalItemThisYear) {
+                    return true;
+                }
+                return false;
+            }).ToList ();
+
+            var oneDayOutItem = this.Items.Where (calItem => {
+                if (today.AddDays (1) == calItem.DateOfCalItemThisYear) {
+                    return true;
+                }
+                return false;
+            }).ToList ();
 
             this.OneMonthItems.AddRange (oneMonthOutItems);
+            this.TwoWeekItems.AddRange (twoWeekOutItems);
+            this.OneWeekItems.AddRange (oneWeekOutItem);
+            this.ThreeDayItems.AddRange (threeDaysOutItem);
+            this.OneDayItems.AddRange (oneDayOutItem);
         }
     }
 }

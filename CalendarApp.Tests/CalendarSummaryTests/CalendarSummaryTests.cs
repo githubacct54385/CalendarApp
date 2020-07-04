@@ -15,11 +15,39 @@ namespace CalendarApp.Tests.CalendarSummaryTests {
             dateOfCalItemThisYear : new DateTime (2020, 12, 25)
         );
 
+        private readonly CalendarSummaryItem _peterBakerBirthday = new CalendarSummaryItem (
+            id: Guid.NewGuid (),
+            name: "Cliff Brooks's Birthday",
+            reminderText: "Say Happy Birthday to Cliff",
+            dateOfCalItemThisYear : new DateTime (2020, 12, 09)
+        );
+
+        private readonly CalendarSummaryItem _sharonWinters = new CalendarSummaryItem (
+            id: Guid.NewGuid (),
+            name: "Sharon Winters's Birthday",
+            reminderText: "Say Happy Birthday to Sharon",
+            dateOfCalItemThisYear : new DateTime (2020, 11, 26)
+        );
+
+        private readonly CalendarSummaryItem _cliffBrooksBirthday = new CalendarSummaryItem (
+            id: Guid.NewGuid (),
+            name: "Peter Baker's Birthday",
+            reminderText: "Say Happy Birthday to Peter",
+            dateOfCalItemThisYear : new DateTime (2020, 12, 2)
+        );
+
         private readonly CalendarSummaryItem _johnDoeBirthday = new CalendarSummaryItem (
             id: Guid.NewGuid (),
             name: "John Doe's Birthday",
             reminderText: "Say Happy Birthday to John",
-            dateOfCalItemThisYear : new DateTime (2020, 12, 23)
+            dateOfCalItemThisYear : new DateTime (2020, 11, 28)
+        );
+
+        private readonly CalendarSummaryItem _maryJaneBirthday = new CalendarSummaryItem (
+            id: Guid.NewGuid (),
+            name: "Mary Jane's Birthday",
+            reminderText: "Say Happy Birthday to Mary",
+            dateOfCalItemThisYear : new DateTime (2020, 11, 28)
         );
 
         private readonly CalendarSummaryItem _halloween = new CalendarSummaryItem (
@@ -45,26 +73,36 @@ namespace CalendarApp.Tests.CalendarSummaryTests {
             return new List<CalendarSummaryItem> () {
                 _christmas,
                 _johnDoeBirthday,
+                _maryJaneBirthday,
+                _peterBakerBirthday,
+                _cliffBrooksBirthday,
+                _sharonWinters,
                 _halloween,
                 _fathersDay
             };
         }
 
         [Fact]
-        public void CalendarSummary_Puts_One_Month_Items_In_OneMonthItems_Property () {
+        public void CalendarSummary_Puts_CalendarSummary_Items_Into_Correct_Properties () {
             //Given
             var calendarSummary = new CalendarSummary (Items (), DateMock (new DateTime (2020, 11, 25)));
-            var expected = new List<CalendarSummaryItem> () { _christmas };
+
+            List<CalendarSummaryItem> oneMonthItems = new List<CalendarSummaryItem> () { _christmas };
+            List<CalendarSummaryItem> twoweekItems = new List<CalendarSummaryItem> () { _peterBakerBirthday };
+            List<CalendarSummaryItem> oneWeekItems = new List<CalendarSummaryItem> () { _cliffBrooksBirthday };
+            List<CalendarSummaryItem> threeDayItems = new List<CalendarSummaryItem> () { _johnDoeBirthday, _maryJaneBirthday };
+            List<CalendarSummaryItem> oneDayItems = new List<CalendarSummaryItem> () { _sharonWinters };
 
             //When
             calendarSummary.Create ();
 
             //Then
-            Assert.Equal (expected, calendarSummary.OneMonthItems);
-            Assert.Empty (calendarSummary.TwoWeekItems);
-            Assert.Empty (calendarSummary.OneWeekItems);
-            Assert.Empty (calendarSummary.ThreeDayItems);
-            Assert.Empty (calendarSummary.OneDayItems);
+
+            Assert.Equal (oneMonthItems, calendarSummary.OneMonthItems);
+            Assert.Equal (twoweekItems, calendarSummary.TwoWeekItems);
+            Assert.Equal (oneWeekItems, calendarSummary.OneWeekItems);
+            Assert.Equal (threeDayItems, calendarSummary.ThreeDayItems);
+            Assert.Equal (oneDayItems, calendarSummary.OneDayItems);
         }
     }
 }
