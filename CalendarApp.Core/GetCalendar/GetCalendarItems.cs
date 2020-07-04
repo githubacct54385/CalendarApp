@@ -8,134 +8,99 @@ namespace CalendarApp.Core.GetCalendar {
     public class GetCalendarItems {
         private readonly ICalendarItemProvider _calendarItemProvider;
         private readonly IDateProvider _dateProvider;
-        private readonly IFutureDateProvider _futureDateProvider;
         public GetCalendarItems (
             ICalendarItemProvider calendarItemProvider,
-            IDateProvider dateProvider,
-            IFutureDateProvider futureDateProvider) {
+            IDateProvider dateProvider) {
             _calendarItemProvider = calendarItemProvider;
             _dateProvider = dateProvider;
-            _futureDateProvider = futureDateProvider;
         }
 
-        public List<CalendarItem> GetItems () {
+        public List<CalendarSummaryItem> GetItems () {
             var today = _dateProvider.GetToday ();
             var items = _calendarItemProvider.GetItems ();
-            var newItems = GetNewStartDatesIfNecessary (items);
-            var afterToday = newItems.Where (p => p.RepeatRules.StartOn > today).ToList ();
-            if (!afterToday.Any ()) {
-                return new List<CalendarItem> ();
+            var datesForThisYear = GetDatesForCurrentYear (items);
+
+            if (!datesForThisYear.Any ()) {
+                return new List<CalendarSummaryItem> ();
             }
-            var remindersToReturn = new List<CalendarItem> ();
-            var nthDayOfMonthRules = afterToday.Where (p => p.When.NthDayOfMonthRules != null).ToList ();
-            var nthWeekdayOfMonthRules = afterToday.Where (p => p.When.NthWeekdayOfMonthRules != null).ToList ();
 
-            remindersToReturn.AddRange (AddNthDayOfMonthRules (nthDayOfMonthRules));
-            remindersToReturn.AddRange (AddNthWeekdayOfMonthRules (nthWeekdayOfMonthRules));
+            var nthDayOfMonthRules = datesForThisYear
+                .Where (p => p is NthDayOfMonthCalendarItem)
+                .Select (p => (NthDayOfMonthCalendarItem) p).ToList ();
+            var nthWeekdayOfMonthRules = datesForThisYear
+                .Where (p => p is NthWeekdayOfMonthCalendarItem)
+                .Select (p => (NthWeekdayOfMonthCalendarItem) p).ToList ();
+
+            var remindersToReturn = new List<CalendarSummaryItem> ();
+
+            foreach (var date in datesForThisYear) {
+                foreach (var reminder in date.RemindAtCsv.Split (',')) {
+                    if (reminder.Length != 2) {
+                        throw new ArgumentException ("Reminder length is not length of 2.  Configuration is wrong.");
+                    }
+                    if (IsDueForReminder (date, reminder) && !remindersToReturn.Contains (date.ToCalendarSummaryItem ())) {
+                        remindersToReturn.Add (date.ToCalendarSummaryItem ());
+                    }
+                }
+            }
             return remindersToReturn;
         }
 
-        private IEnumerable<CalendarItem> AddNthWeekdayOfMonthRules (List<CalendarItem> nthWeekdayOfMonthRules) {
-            var remindersToReturn = new List<CalendarItem> ();
-            nthWeekdayOfMonthRules.ForEach (entry => {
-                entry.Reminders.Split (',').ToList ().ForEach (reminder => {
-                    CheckReminderLength (reminder);
-                    AddCalendarItemsToList (entry, reminder, remindersToReturn);
-                });
-            });
-            return remindersToReturn;
+        private List<CalendarItemBase> GetDatesForCurrentYear (List<CalendarItemBase> calendarItems) {
+            var newCalItems = new List<CalendarItemBase> ();
+            foreach (var calendarItem in calendarItems) {
+                switch (calendarItem) {
+                    case NthDayOfMonthCalendarItem nthDayCalItem:
+                        nthDayCalItem.HandleYearUpdate (_dateProvider);
+                        newCalItems.Add (nthDayCalItem);
+                        break;
+                    case NthWeekdayOfMonthCalendarItem nthWeekdayCalItem:
+                        nthWeekdayCalItem.HandleYearUpdate (_dateProvider);
+                        newCalItems.Add (nthWeekdayCalItem);
+                        break;
+                    default:
+                        throw new Exception ("Unknown derived type.");
+                }
+            }
+            return newCalItems;
         }
 
-        private List<CalendarItem> AddNthDayOfMonthRules (List<CalendarItem> nthDayOfMonthRules) {
-            var remindersToReturn = new List<CalendarItem> ();
-            nthDayOfMonthRules.ForEach (entry => {
-                entry.Reminders.Split (',').ToList ().ForEach (reminder => {
-                    CheckReminderLength (reminder);
-                    AddCalendarItemsToList (entry, reminder, remindersToReturn);
-                });
-            });
-            return remindersToReturn;
-        }
-
-        private void AddCalendarItemsToList (CalendarItem entry, string reminder, List<CalendarItem> remindersToReturn) {
-            int.TryParse (reminder[0].ToString (), out int amount);
+        private bool IsDueForReminder (CalendarItemBase date, string reminder) {
+            var amount = int.Parse (reminder[0].ToString ());
             var unit = reminder[1];
             switch (unit) {
                 case 'm':
-                    var daysInMonth = 30;
-                    if (IsWithinReminderThreshold (amount, daysInMonth, entry)) {
-                        if (CanAddToReminders (remindersToReturn, entry)) {
-                            remindersToReturn.Add (entry);
-                        }
-                    }
-                    break;
+                    return IsExactlyNMonthsAway (amount, date);
                 case 'w':
-                    var daysInWeek = 7;
-                    if (IsWithinReminderThreshold (amount, daysInWeek, entry)) {
-                        if (CanAddToReminders (remindersToReturn, entry)) {
-                            remindersToReturn.Add (entry);
-                        }
-                    }
-                    break;
+                    return IsExactlyNWeeksAway (amount, date);
                 case 'd':
-                    var day = 1;
-                    if (IsWithinReminderThreshold (amount, day, entry)) {
-                        if (CanAddToReminders (remindersToReturn, entry)) {
-                            remindersToReturn.Add (entry);
-                        }
-                    }
-                    break;
+                    return IsExactlyNDaysAway (amount, date);
                 default:
                     throw new ArgumentException ("Unknown unit.  Only m,w,d are allowed.");
             }
         }
 
-        private void CheckReminderLength (string reminder) {
-            if (reminder.Length != 2) {
-                throw new ArgumentException ("Reminder length is not length of 2.  Configuration is wrong.");
-            }
+        private bool IsExactlyNMonthsAway (int amount, CalendarItemBase date) {
+            var daysToSubtract = amount * 30;
+            return IsExactlyDateTimeUnitsAway (daysToSubtract, date);
+        }
+        private bool IsExactlyNWeeksAway (int amount, CalendarItemBase date) {
+            var daysToSubtract = amount * 7;
+            return IsExactlyDateTimeUnitsAway (daysToSubtract, date);
+        }
+        private bool IsExactlyNDaysAway (int amount, CalendarItemBase date) {
+            var daysToSubtract = amount * 1;
+            return IsExactlyDateTimeUnitsAway (daysToSubtract, date);
         }
 
-        private List<CalendarItem> GetNewStartDatesIfNecessary (List<CalendarItem> calendarItems) {
-
-            return calendarItems.Select (item => {
-                if (item.When.NthWeekdayOfMonthRules != null) {
-                    return _futureDateProvider.CalcCalendarItemForThisYear (item);
-                } else {
-                    var previousYear = item.RepeatRules.StartOn.Year < _dateProvider.GetToday ().Year;
-                    if (previousYear) {
-                        return _futureDateProvider.CalcFutureDate (item);
-                    } else {
-                        return item;
-                    }
-                }
-            }).ToList ();
-        }
-
-        private CalendarItem CalendarItemWithThisYear (CalendarItem item) {
-            var repeatRules = item.RepeatRules;
-            var startOn = repeatRules.StartOn;
-            var date = new DateTime (_dateProvider.GetToday ().Year, startOn.Month, startOn.Day);
-            var newRepeatRules = new RepeatRules (date, repeatRules.EndOn);
-            return new CalendarItem (item.Id, item.Name, item.Reminder, item.RepeatsYearly, item.When, newRepeatRules, item.Reminders);
-        }
-
-        private bool IsWithinReminderThreshold (int amount, int unit, CalendarItem entry) {
-            var daysToAdd = amount * unit;
-            var startOn = entry.RepeatRules.StartOn;
-            var dateMinusReminderLength = startOn - TimeSpan.FromDays (daysToAdd);
+        private bool IsExactlyDateTimeUnitsAway (int daysToSubtract, CalendarItemBase date) {
+            var startOn = date.DateOfCalItemThisYear;
+            var dateMinusReminderLength = startOn - TimeSpan.FromDays (daysToSubtract);
             var today = _dateProvider.GetToday ();
             if (dateMinusReminderLength == today) {
                 return true;
             }
             return false;
-        }
-
-        private bool CanAddToReminders (List<CalendarItem> list, CalendarItem newItem) {
-            if (list.Contains (newItem)) {
-                return false;
-            }
-            return true;
         }
     }
 }
