@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CalendarApp.Core.CreateSummary;
-using CalendarApp.Core.CreateSummary.Models;
 using CalendarApp.Core.GetCalendar.Interface;
 using CalendarApp.Core.GetCalendar.Models;
 using Moq;
@@ -9,32 +8,31 @@ using Xunit;
 
 namespace CalendarApp.Tests.CalendarSummaryTests {
     public class CalendarSummaryTests {
-        private readonly CalendarItem _christmas = new CalendarItem (
+        private readonly CalendarSummaryItem _christmas = new CalendarSummaryItem (
             id: Guid.NewGuid (),
             name: "Christmas",
-            reminder: "Say Merry Christmas",
-            repeatsYearly : true,
-            when : new When (new NthDayOfMonthRules (12, 25), null),
-            repeatRules : new RepeatRules (new DateTime (2020, 12, 25), null),
-            reminders: "1d,3d,7d,2w,1m"
+            reminderText: "Say Merry Christmas",
+            dateOfCalItemThisYear : new DateTime (2020, 12, 25)
         );
-        private readonly CalendarItem _halloween = new CalendarItem (
+
+        private readonly CalendarSummaryItem _johnDoeBirthday = new CalendarSummaryItem (
+            id: Guid.NewGuid (),
+            name: "John Doe's Birthday",
+            reminderText: "Say Happy Birthday to John",
+            dateOfCalItemThisYear : new DateTime (2020, 12, 23)
+        );
+
+        private readonly CalendarSummaryItem _halloween = new CalendarSummaryItem (
             id: Guid.Parse ("22884935-6378-4a8a-93ba-6cebb992bb97"),
             name: "Halloween",
-            reminder: "Go trick or treating and be spooky!",
-            repeatsYearly : true,
-            when : new When (new NthDayOfMonthRules (10, 31), nthWeekdayOfMonthRules : null),
-            repeatRules : new RepeatRules (startOn: new DateTime (2020, 10, 31), endOn : null),
-            reminders: "1d,3d,7d,2w,1m"
+            reminderText: "Go trick or treating and be spooky!",
+            dateOfCalItemThisYear : new DateTime (2020, 10, 31)
         );
-        private readonly CalendarItem _fathersDay = new CalendarItem (
+        private readonly CalendarSummaryItem _fathersDay = new CalendarSummaryItem (
             id: Guid.Parse ("600de851-378c-4c59-baa5-5d1503206545"),
             name: "Fathers Day",
-            reminder: "Call your dad.",
-            repeatsYearly : true,
-            when : new When (nthDayOfMonthRules: null, nthWeekdayOfMonthRules: new NthWeekdayOfMonthRules (weekday : DayOfWeek.Sunday, nthWeekday : 3)),
-            repeatRules : new RepeatRules (startOn: new DateTime (2020, 06, 21), endOn : null),
-            reminders: "1d,3d,7d,2w,1m"
+            reminderText: "Call your dad.",
+            dateOfCalItemThisYear : new DateTime (2020, 6, 21)
         );
 
         public static IDateProvider DateMock (DateTime date) {
@@ -43,19 +41,20 @@ namespace CalendarApp.Tests.CalendarSummaryTests {
             return dateMock.Object;
         }
 
-        public List<CalendarItem> Items () {
-            return new List<CalendarItem> () {
+        public List<CalendarSummaryItem> Items () {
+            return new List<CalendarSummaryItem> () {
                 _christmas,
+                _johnDoeBirthday,
                 _halloween,
                 _fathersDay
             };
         }
 
         [Fact]
-        public void CalendarSummary_Puts_One_Month_ () {
+        public void CalendarSummary_Puts_One_Month_Items_In_OneMonthItems_Property () {
             //Given
-            var calendarSummary = new CalendarSummary (Items (), DateMock (new DateTime (2020, 12, 01)));
-            var expected = new List<CalendarItem> () { _christmas };
+            var calendarSummary = new CalendarSummary (Items (), DateMock (new DateTime (2020, 11, 25)));
+            var expected = new List<CalendarSummaryItem> () { _christmas };
 
             //When
             calendarSummary.Create ();
