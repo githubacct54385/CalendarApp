@@ -6,7 +6,7 @@ using CalendarApp.Core.GetCalendar.Models;
 namespace CalendarApp.Core.CreateSummary {
     public class CalendarSummary {
         public List<CalendarSummaryItem> Items { get; }
-        public List<CalendarSummaryItem> OneMonthItems { get; set; } = new List<CalendarSummaryItem> ();
+        public List<CalendarSummaryItem> OneMonthItemsList { get; set; } = new List<CalendarSummaryItem> ();
         public List<CalendarSummaryItem> TwoWeekItems { get; set; } = new List<CalendarSummaryItem> ();
         public List<CalendarSummaryItem> OneWeekItems { get; set; } = new List<CalendarSummaryItem> ();
         public List<CalendarSummaryItem> ThreeDayItems { get; set; } = new List<CalendarSummaryItem> ();
@@ -19,49 +19,20 @@ namespace CalendarApp.Core.CreateSummary {
         }
 
         public void Create () {
-            var today = _dateProvider.GetToday ();
+            this.OneMonthItemsList.AddRange (GetItems (daysAway: 30));
+            this.TwoWeekItems.AddRange (GetItems (daysAway: 14));
+            this.OneWeekItems.AddRange (GetItems (daysAway: 7));
+            this.ThreeDayItems.AddRange (GetItems (daysAway: 3));
+            this.OneDayItems.AddRange (GetItems (daysAway: 1));
+        }
 
-            var oneMonthOutItems = this.Items.Where (calItem => {
-                if (today.AddDays (30) == calItem.DateOfCalItemThisYear) {
+        private List<CalendarSummaryItem> GetItems (int daysAway) {
+            return this.Items.Where (calItem => {
+                if (_dateProvider.GetToday ().AddDays (daysAway) == calItem.DateOfCalItemThisYear) {
                     return true;
                 }
                 return false;
             }).ToList ();
-
-            var twoWeekOutItems = this.Items
-                .Where (calItem => {
-                    if (today.AddDays (14) == calItem.DateOfCalItemThisYear) {
-                        return true;
-                    }
-                    return false;
-                }).ToList ();
-
-            var oneWeekOutItem = this.Items.Where (calItem => {
-                if (today.AddDays (7) == calItem.DateOfCalItemThisYear) {
-                    return true;
-                }
-                return false;
-            }).ToList ();
-
-            var threeDaysOutItem = this.Items.Where (calItem => {
-                if (today.AddDays (3) == calItem.DateOfCalItemThisYear) {
-                    return true;
-                }
-                return false;
-            }).ToList ();
-
-            var oneDayOutItem = this.Items.Where (calItem => {
-                if (today.AddDays (1) == calItem.DateOfCalItemThisYear) {
-                    return true;
-                }
-                return false;
-            }).ToList ();
-
-            this.OneMonthItems.AddRange (oneMonthOutItems);
-            this.TwoWeekItems.AddRange (twoWeekOutItems);
-            this.OneWeekItems.AddRange (oneWeekOutItem);
-            this.ThreeDayItems.AddRange (threeDaysOutItem);
-            this.OneDayItems.AddRange (oneDayOutItem);
         }
     }
 }

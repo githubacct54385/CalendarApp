@@ -98,7 +98,7 @@ namespace CalendarApp.Tests.CalendarSummaryTests {
 
             //Then
 
-            Assert.Equal (oneMonthItems, calendarSummary.OneMonthItems);
+            Assert.Equal (oneMonthItems, calendarSummary.OneMonthItemsList);
             Assert.Equal (twoweekItems, calendarSummary.TwoWeekItems);
             Assert.Equal (oneWeekItems, calendarSummary.OneWeekItems);
             Assert.Equal (threeDayItems, calendarSummary.ThreeDayItems);
