@@ -12,35 +12,35 @@ namespace CalendarApp.Tests.SampleData {
 
         public static readonly CalendarSummaryItem PeterBakersBirthday = new CalendarSummaryItem (
             id: Guid.NewGuid (),
-            name: "Cliff Brooks' Birthday",
+            name: "Cliff Brooks Birthday",
             reminderText: "Say Happy Birthday to Cliff",
             dateOfCalItemThisYear : new DateTime (2020, 12, 09)
         );
 
         public static readonly CalendarSummaryItem SharonWintersBirthday = new CalendarSummaryItem (
             id: Guid.NewGuid (),
-            name: "Sharon Winters' Birthday",
+            name: "Sharon Winters Birthday",
             reminderText: "Say Happy Birthday to Sharon",
             dateOfCalItemThisYear : new DateTime (2020, 11, 26)
         );
 
         public static readonly CalendarSummaryItem CliffBrooksBirthday = new CalendarSummaryItem (
             id: Guid.NewGuid (),
-            name: "Peter Baker's Birthday",
+            name: "Peter Baker Birthday",
             reminderText: "Say Happy Birthday to Peter",
             dateOfCalItemThisYear : new DateTime (2020, 12, 2)
         );
 
         public static readonly CalendarSummaryItem JohnDoesBirthday = new CalendarSummaryItem (
             id: Guid.NewGuid (),
-            name: "John Doe's Birthday",
+            name: "John Doe Birthday",
             reminderText: "Say Happy Birthday to John",
             dateOfCalItemThisYear : new DateTime (2020, 11, 28)
         );
 
         public static readonly CalendarSummaryItem MaryJanesBirthday = new CalendarSummaryItem (
             id: Guid.NewGuid (),
-            name: "Mary Jane's Birthday",
+            name: "Mary Jane Birthday",
             reminderText: "Say Happy Birthday to Mary",
             dateOfCalItemThisYear : new DateTime (2020, 11, 28)
         );

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.Json;
 using CalendarApp.Core.CreateSummary;
 using CalendarApp.Core.GetCalendar.Interface;
-using CalendarApp.Core.SlackSummary.Interface;
 using CalendarApp.Core.SlackSummary.Models;
 
 namespace CalendarApp.Core.SlackSummary {
@@ -19,14 +18,14 @@ namespace CalendarApp.Core.SlackSummary {
         }
 
         public void AddSection (string header) {
-            var sectionBlock = new SectionBlock ("mrkdn", $"{header}");
-            var block = new Block (type: "section", text : sectionBlock, elements : null);
+            var sectionBlock = new SectionBlock ("mrkdwn", $"{header}");
+            var block = new Block (type: "section", text : sectionBlock, elements : null, fields : null);
             AddBlock (block);
         }
 
         public void AddBoldSection (string header) {
-            var sectionBlock = new SectionBlock ("mrkdn", $"*{header}*");
-            var block = new Block (type: "section", text : sectionBlock, elements : null);
+            var sectionBlock = new SectionBlock ("mrkdwn", $"*{header}*");
+            var block = new Block (type: "section", text : sectionBlock, elements : null, fields : null);
             AddBlock (block);
         }
 
@@ -34,8 +33,13 @@ namespace CalendarApp.Core.SlackSummary {
             var dateString = _dateProvider.GetToday ().ToString ("MMMM dd, yyyy");
             var text = $"Your event summary for {dateString}";
 
-            var elements = new List<Element> () { new Element (type: "mrkdn", text) };
-            var block = new Block (type: "context", text : null, elements);
+            var elements = new List<Element> () { new Element (type: "mrkdwn", text) };
+            var block = new Block (type: "context", text : null, elements, fields : null);
+            AddBlock (block);
+        }
+
+        public void AddFieldsSection (List<Field> fields) {
+            var block = new Block (type: "section", text : null, elements : null, fields : fields);
             AddBlock (block);
         }
 
@@ -98,19 +102,19 @@ namespace CalendarApp.Core.SlackSummary {
             var eventsText = eventCount == 1 ? "Event" : "Events";
             switch (daysUntil) {
                 case 1:
-                    AddSection ($":calendar: {eventCount} {eventsText} happening tomorrow :calendar:");
+                    AddSection ($":calendar: {eventCount} {eventsText} happening tomorrow");
                     break;
                 case 3:
-                    AddSection ($":calendar: {eventCount} {eventsText} happening 3 days from now :calendar:");
+                    AddSection ($":calendar: {eventCount} {eventsText} happening 3 days from now");
                     break;
                 case 7:
-                    AddSection ($":calendar: {eventCount} {eventsText} happening a week from now :calendar:");
+                    AddSection ($":calendar: {eventCount} {eventsText} happening 1 week from now");
                     break;
                 case 14:
-                    AddSection ($":calendar: {eventCount} {eventsText} happening 2 weeks from now :calendar:");
+                    AddSection ($":calendar: {eventCount} {eventsText} happening 2 weeks from now");
                     break;
                 case 30:
-                    AddSection ($":calendar: {eventCount} {eventsText} happening one month from now :calendar:");
+                    AddSection ($":calendar: {eventCount} {eventsText} happening 1 month from now");
                     break;
                 default:
                     throw new ArgumentException ($"Unexpected value {daysUntil}", nameof (daysUntil));
@@ -118,12 +122,16 @@ namespace CalendarApp.Core.SlackSummary {
         }
 
         private void AddSectionForCalendarSummary (GetCalendar.Models.CalendarSummaryItem item) {
-            AddSection ($"`{item.DateOfCalItemThisYear.ToString("MM/dd/yyyy")}` {item.Name} --- {item.ReminderText}");
+            string date = item.DateOfCalItemThisYear.ToString ("MM/dd/yyyy");
+            var fields = new List<Field> ();
+            fields.Add (new Field (type: "mrkdwn", header: "When", value : date));
+            fields.Add (new Field (type: "mrkdwn", header: "Event", value : item.Name));
+            AddFieldsSection (fields);
         }
 
         public string Serialize () {
-            Console.Write (JsonSerializer.Serialize<SlackJsonModel> (SlackJsonModel, SerializationOptionsWithoutIndentation ()));
-            return JsonSerializer.Serialize<SlackJsonModel> (SlackJsonModel, SerializationOptionsWithoutIndentation ());
+            string json = JsonSerializer.Serialize<SlackJsonModel> (SlackJsonModel, SerializationOptionsWithoutIndentation ());
+            return json.Replace ("\\n", "\n");
         }
 
         public SlackJsonModel SlackJsonModel { get; set; }
@@ -131,15 +139,11 @@ namespace CalendarApp.Core.SlackSummary {
             this.SlackJsonModel.Blocks.Add (block);
         }
 
-        public string HeaderJson () {
-            throw new NotImplementedException ();
-        }
-
         private JsonSerializerOptions SerializationOptionsWithIndentation () {
             var options = new JsonSerializerOptions {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
-                IgnoreNullValues = true
+                IgnoreNullValues = true,
             };
             return options;
         }
@@ -148,7 +152,7 @@ namespace CalendarApp.Core.SlackSummary {
             var options = new JsonSerializerOptions {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = false,
-                IgnoreNullValues = true
+                IgnoreNullValues = true,
             };
             return options;
         }
