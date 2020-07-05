@@ -10,14 +10,14 @@ namespace CalendarApp.Tests.GetItemsTests {
             return dateMock.Object;
         }
 
-        public static ICalendarItemProvider NthDayOfMonthCalendarMock (int numItems) {
-            var calendarItemsMock = new Mock<ICalendarItemProvider> ();
+        public static IDeserializedCalendarItemProvider NthDayOfMonthCalendarMock (int numItems) {
+            var calendarItemsMock = new Mock<IDeserializedCalendarItemProvider> ();
             calendarItemsMock.Setup (x => x.GetItems ()).Returns (NthDayOfMonthSampleData.SampleDates (numItems));
             return calendarItemsMock.Object;
         }
 
-        public static ICalendarItemProvider NthWeekdayOfMonthCalendarItemMock (int numItems) {
-            var calendarItemsMock = new Mock<ICalendarItemProvider> ();
+        public static IDeserializedCalendarItemProvider NthWeekdayOfMonthCalendarItemMock (int numItems) {
+            var calendarItemsMock = new Mock<IDeserializedCalendarItemProvider> ();
             calendarItemsMock.Setup (x => x.GetItems ()).Returns (NthWeekdayOfMonthSampleData.SampleDates (numItems));
             return calendarItemsMock.Object;
         }

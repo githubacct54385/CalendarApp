@@ -6,10 +6,10 @@ using CalendarApp.Core.GetCalendar.Models;
 
 namespace CalendarApp.Core.GetCalendar {
     public class GetCalendarItems {
-        private readonly ICalendarItemProvider _calendarItemProvider;
+        private readonly IDeserializedCalendarItemProvider _calendarItemProvider;
         private readonly IDateProvider _dateProvider;
         public GetCalendarItems (
-            ICalendarItemProvider calendarItemProvider,
+            IDeserializedCalendarItemProvider calendarItemProvider,
             IDateProvider dateProvider) {
             _calendarItemProvider = calendarItemProvider;
             _dateProvider = dateProvider;
