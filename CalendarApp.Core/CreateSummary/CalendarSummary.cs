@@ -16,9 +16,10 @@ namespace CalendarApp.Core.CreateSummary {
         public CalendarSummary (List<CalendarSummaryItem> items, IDateProvider dateProvider) {
             this.Items = items;
             _dateProvider = dateProvider;
+            Create ();
         }
 
-        public void Create () {
+        private void Create () {
             this.OneMonthItemsList.AddRange (GetItems (daysAway: 30));
             this.TwoWeekItems.AddRange (GetItems (daysAway: 14));
             this.OneWeekItems.AddRange (GetItems (daysAway: 7));
