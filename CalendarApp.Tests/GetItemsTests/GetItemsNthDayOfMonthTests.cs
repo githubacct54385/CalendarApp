@@ -4,7 +4,7 @@ using CalendarApp.Core.GetCalendar;
 using CalendarApp.Core.GetCalendar.Models;
 using Xunit;
 
-namespace CalendarApp.Tests {
+namespace CalendarApp.Tests.GetItemsTests {
     public class GetItemsNthDayOfMonthTests {
 
         [Theory]

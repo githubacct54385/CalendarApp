@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using CalendarApp.Core.GetCalendar.Models;
 
-namespace CalendarApp.Tests {
+namespace CalendarApp.Tests.GetItemsTests {
     public class NthWeekdayOfMonthSampleData {
         public static List<CalendarItemBase> SampleDates (int numItems) {
             switch (numItems) {

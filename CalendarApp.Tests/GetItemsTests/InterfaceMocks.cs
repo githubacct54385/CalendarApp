@@ -2,7 +2,7 @@ using System;
 using CalendarApp.Core.GetCalendar.Interface;
 using Moq;
 
-namespace CalendarApp.Tests {
+namespace CalendarApp.Tests.GetItemsTests {
     public class InterfaceMocks {
         public static IDateProvider DateMock (DateTime date) {
             var dateMock = new Mock<IDateProvider> ();
